@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, override
+from typing import TYPE_CHECKING, Any, override
 
 from google_play_scraper import Sort, app, reviews
 from singer_sdk import typing as th
@@ -12,7 +12,7 @@ from tap_google_play.client import GooglePlayStream
 if TYPE_CHECKING:
     from collections.abc import Iterable
 
-    from singer_sdk.helpers.types import Context
+    from singer_sdk.helpers.types import Context, Record
 
 
 class ReviewsStream(GooglePlayStream):
@@ -39,13 +39,13 @@ class ReviewsStream(GooglePlayStream):
 
     @override
     @property
-    def partitions(self) -> list[dict]:
+    def partitions(self) -> list[dict[str, Any]]:
         """Return a list of partitions for the stream."""
         app_ids = self.config.get("app_id_list", [self.config.get("app_id")])
         return [{"appId": app_id} for app_id in app_ids]
 
     @override
-    def get_records(self, context: Context | None) -> Iterable[dict]:
+    def get_records(self, context: Context | None) -> Iterable[Record]:
         """Return a generator of row-type dictionary objects."""
         start_date = self.get_starting_timestamp(context)
         if start_date:
@@ -67,7 +67,7 @@ class ReviewsStream(GooglePlayStream):
                 country="us",
                 sort=Sort.NEWEST,
                 count=1000,
-                continuation_token=continuation_token,
+                continuation_token=continuation_token,  # ty: ignore[invalid-argument-type]
             )
 
             if not result:

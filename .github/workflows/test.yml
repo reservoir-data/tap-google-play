@@ -33,6 +33,7 @@ env:
 
 jobs:
   test:
+    name: Integration
     runs-on: ubuntu-24.04
     env:
       NOXFORCEPYTHON: ${{ matrix.python-version }}
@@ -67,6 +68,7 @@ jobs:
         nox --verbose
 
   typing:
+    name: Type Checks
     runs-on: ubuntu-24.04
     steps:
     - name: Checkout code
@@ -83,4 +85,4 @@ jobs:
       run: >
         uvx
         --with nox==${{ env.NOX_VERSION }}
-        nox --verbose -s mypy
+        nox --verbose -t typing
