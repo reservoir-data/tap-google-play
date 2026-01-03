@@ -1,19 +1,21 @@
+#!/usr/bin/env -S uv run --script
+
+# /// script
+# dependencies = ["nox"]
+# ///
+
 """Nox configuration."""
 
 from __future__ import annotations
 
 import nox
 
-python_versions = [
-    "3.14",
-    "3.13",
-    "3.12",
-    "3.11",
-    "3.10",
-]
+PYPROJECT = nox.project.load_toml()
+python_versions = nox.project.python_versions(PYPROJECT)
+
 nox.needs_version = ">=2024.4.15"
 nox.options.default_venv_backend = "uv"
-nox.options.sessions = ("tests", "lint", "mypy")
+nox.options.reuse_venv = "yes"
 
 
 @nox.session
@@ -44,8 +46,19 @@ def tests(session: nox.Session) -> None:
     )
 
 
-@nox.session
+@nox.session(tags=["typing"])
 def mypy(session: nox.Session) -> None:
-    """Check types."""
+    """Check types with mypy."""
     args = session.posargs or ("tap_google_play",)
     session.run("uv", "run", "--active", "mypy", *args)
+
+
+@nox.session(tags=["typing"])
+def ty(session: nox.Session) -> None:
+    """Check types with ty."""
+    args = session.posargs or ("tap_google_play",)
+    session.run("uv", "run", "--active", "ty", "check", *args)
+
+
+if __name__ == "__main__":
+    nox.main()
