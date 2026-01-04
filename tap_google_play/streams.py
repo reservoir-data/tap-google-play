@@ -2,15 +2,17 @@
 
 from __future__ import annotations
 
-import typing as t
+from typing import TYPE_CHECKING, Any, override
 
 from google_play_scraper import Sort, app, reviews
 from singer_sdk import typing as th
 
 from tap_google_play.client import GooglePlayStream
 
-if t.TYPE_CHECKING:
-    from singer_sdk.helpers.types import Context
+if TYPE_CHECKING:
+    from collections.abc import Iterable
+
+    from singer_sdk.helpers.types import Context, Record
 
 
 class ReviewsStream(GooglePlayStream):
@@ -21,10 +23,10 @@ class ReviewsStream(GooglePlayStream):
     replication_key = "at"
     schema = th.PropertiesList(
         th.Property("userName", th.StringType),
-        th.Property("userImage", th.StringType),
+        th.Property("userImage", th.URIType),
         th.Property("content", th.StringType),
-        th.Property("score", th.IntegerType),
-        th.Property("thumbsUpCount", th.IntegerType),
+        th.Property("score", th.IntegerType(minimum=0, maximum=5)),
+        th.Property("thumbsUpCount", th.IntegerType(minimum=0)),
         th.Property("reviewCreatedVersion", th.StringType),
         th.Property("at", th.DateTimeType),
         th.Property("replyContent", th.StringType),
@@ -37,8 +39,9 @@ class ReviewsStream(GooglePlayStream):
         th.Property("country", th.StringType),
     ).to_dict()
 
+    @override
     @property
-    def partitions(self) -> list[Context]:
+    def partitions(self) -> list[dict[str, Any]]:
         """Return a list of partitions for the stream."""
         app_ids = self.config.get("app_id_list", [self.config.get("app_id")])
         languages = self.config.get("languages", ["en"])
@@ -50,7 +53,8 @@ class ReviewsStream(GooglePlayStream):
             for country in countries
         ]
 
-    def get_records(self, context: Context | None) -> t.Iterable[dict]:
+    @override
+    def get_records(self, context: Context | None) -> Iterable[Record]:
         """Return a generator of row-type dictionary objects."""
         start_date = self.get_starting_timestamp(context)
         if start_date:
@@ -74,7 +78,7 @@ class ReviewsStream(GooglePlayStream):
                 country=country,
                 sort=Sort.NEWEST,
                 count=1000,
-                continuation_token=continuation_token,
+                continuation_token=continuation_token,  # ty: ignore[invalid-argument-type]
             )
 
             if not result:
