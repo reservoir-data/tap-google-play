@@ -24,7 +24,6 @@ authors = [
   { name = "hotglue", email = "hello@hotglue.xyz" },
 ]
 requires-python = ">=3.12"
-
 classifiers = [
   "Programming Language :: Python :: 3 :: Only",
   "Programming Language :: Python :: 3.12",
@@ -36,7 +35,6 @@ dependencies = [
   "google-play-scraper==1.2.7",
   "singer-sdk~=0.53.2",
 ]
-
 scripts.tap-google-play = "tap_google_play.tap:TapGooglePlay.cli"
 
 [dependency-groups]
@@ -49,8 +47,8 @@ dev = [
   "ty>=0.0.8",
 ]
 
-[tool.hatch.version]
-source = "vcs"
+[tool.hatch]
+version.source = "vcs"
 
 [tool.uv]
 required-version = ">=0.5.19"
