@@ -26,6 +26,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 env:
   FORCE_COLOR: "1"
   PYO3_USE_ABI3_FORWARD_COMPATIBILITY: "1"
@@ -35,22 +39,35 @@ env:
   NOX_VERSION: 2026.4.10
 
 jobs:
-  test:
-    name: Integration
+  build-package:
+    name: Build & verify package
     runs-on: ubuntu-24.04
+    outputs:
+      supported-python-versions: ${{ steps.baipp.outputs.supported_python_classifiers_json_array }}
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: hynek/build-and-inspect-python-package@d44ca7d91762de7a7d5436ddae667c6da6d1c3df # v2.18.0
+        id: baipp
+
+  test:
+    name: Tests
+    runs-on: ubuntu-24.04
+    needs: build-package
     env:
       NOXFORCEPYTHON: ${{ matrix.python-version }}
       NOXSESSION: tests
     strategy:
       matrix:
-        python-version:
-        - "3.12"
-        - "3.13"
-        - "3.14"
+        python-version: ${{ fromJson(needs.build-package.outputs.supported-python-versions) }}
 
     steps:
     - name: Checkout code
       uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      with:
+        persist-credentials: false
 
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
@@ -67,7 +84,7 @@ jobs:
         TAP_GOOGLE_PLAY_APP_ID: com.ifountain.opsgenie
       run: >
         uvx
-        --with nox==${{ env.NOX_VERSION }}
+        --with nox=="${NOX_VERSION}"
         nox --verbose
 
   typing:
@@ -76,6 +93,8 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      with:
+        persist-credentials: false
 
     - name: Set up Python
       uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
@@ -87,5 +106,5 @@ jobs:
     - name: Run typing checks
       run: >
         uvx
-        --with nox==${{ env.NOX_VERSION }}
+        --with nox=="${NOX_VERSION}"
         nox --verbose -t typing

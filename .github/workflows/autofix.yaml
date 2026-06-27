@@ -1,5 +1,8 @@
 name: autofix.ci
 
+permissions:
+  contents: read
+
 on:
   pull_request:
   push:
@@ -25,6 +28,8 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      with:
+        persist-credentials: false
 
     - name: Set up Python
       uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
@@ -37,7 +42,7 @@ jobs:
       continue-on-error: true
       run: >
         uvx
-        --with nox==${{ env.NOX_VERSION }}
+        --with nox=="${NOX_VERSION}"
         nox --verbose -s lint
 
     - uses: autofix-ci/action@c5b2d67aa2274e7b5a18224e8171550871fc7e4a # v1.3.4

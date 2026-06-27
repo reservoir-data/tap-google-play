@@ -874,7 +874,7 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "google-play-scraper", specifier = "==1.2.7" },
-    { name = "singer-sdk", specifier = "~=0.54.0a2" },
+    { name = "singer-sdk", specifier = "~=0.54.5" },
 ]
 
 [package.metadata.requires-dev]
