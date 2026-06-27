@@ -2,7 +2,7 @@
 build-backend = "hatchling.build"
 requires = [
   "hatch-vcs==0.5",
-  "hatchling==1.29",
+  "hatchling==1.30.1",
 ]
 
 [project]
@@ -26,7 +26,7 @@ classifiers = [
 dynamic = [ "version" ]
 dependencies = [
   "google-play-scraper==1.2.7",
-  "singer-sdk~=0.54.0a2",
+  "singer-sdk~=0.54.5",
 ]
 [[project.authors]]
 name = "Edgar Ramírez-Mondragón"
@@ -90,21 +90,22 @@ pydocstyle.convention = "google"
 table_format = "long"
 
 [tool.mypy]
+follow_untyped_imports = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_unreachable = true
 enable_error_code = [
   "ignore-without-code",
   "redundant-expr",
   "truthy-bool",
 ]
 strict = true
-warn_redundant_casts = true
-warn_unreachable = true
 warn_unused_configs = true
-warn_unused_ignores = true
 [[tool.mypy.overrides]]
-ignore_missing_imports = true
 module = [
   "google_play_scraper.*", # https://github.com/JoMingyu/google-play-scraper/issues/223
 ]
+ignore_missing_imports = true
 
 [tool.pytest]
 addopts = [

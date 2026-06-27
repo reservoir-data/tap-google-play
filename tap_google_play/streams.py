@@ -2,9 +2,11 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, override
+from typing import TYPE_CHECKING, Any, TypedDict, override
 
-from google_play_scraper import Sort, app, reviews
+from google_play_scraper.constants.google_play import Sort
+from google_play_scraper.features.app import app
+from google_play_scraper.features.reviews import _ContinuationToken, reviews
 from singer_sdk import typing as th
 
 from tap_google_play.client import GooglePlayStream
@@ -15,11 +17,15 @@ if TYPE_CHECKING:
     from singer_sdk.helpers.types import Context, Record
 
 
+class _ReviewsKwargs(TypedDict, total=False):
+    continuation_token: _ContinuationToken
+
+
 class ReviewsStream(GooglePlayStream):
     """Define custom stream."""
 
     name = "reviews"
-    primary_keys = ["reviewId"]  # noqa: RUF012
+    primary_keys = ("reviewId",)
     replication_key = "at"
     schema = th.PropertiesList(
         th.Property("userName", th.StringType),
@@ -37,8 +43,8 @@ class ReviewsStream(GooglePlayStream):
         th.Property("developerId", th.StringType),
     ).to_dict()
 
-    @override
     @property
+    @override
     def partitions(self) -> list[dict[str, Any]]:
         """Return a list of partitions for the stream."""
         app_ids = self.config.get("app_id_list", [self.config.get("app_id")])
@@ -59,7 +65,7 @@ class ReviewsStream(GooglePlayStream):
 
         self.logger.info("Getting reviews for %s", app_id)
         app_details = app(app_id, lang="en", country="us")
-        continuation_token = None
+        kwargs: _ReviewsKwargs = {}
         while True:
             result, continuation_token = reviews(
                 app_id,
@@ -67,8 +73,9 @@ class ReviewsStream(GooglePlayStream):
                 country="us",
                 sort=Sort.NEWEST,
                 count=1000,
-                continuation_token=continuation_token,  # ty: ignore[invalid-argument-type]
+                **kwargs,
             )
+            kwargs["continuation_token"] = continuation_token
 
             if not result:
                 break
