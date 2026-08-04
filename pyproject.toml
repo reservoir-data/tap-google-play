@@ -22,6 +22,7 @@ classifiers = [
   "Programming Language :: Python :: 3.12",
   "Programming Language :: Python :: 3.13",
   "Programming Language :: Python :: 3.14",
+  "Programming Language :: Python :: 3.15",
 ]
 dynamic = [ "version" ]
 dependencies = [
@@ -31,6 +32,7 @@ dependencies = [
 [[project.authors]]
 name = "Edgar Ramírez-Mondragón"
 email = "edgarrm358@gmail.com"
+
 [[project.authors]]
 name = "hotglue"
 email = "hello@hotglue.xyz"
@@ -87,6 +89,7 @@ flake8-annotations.allow-star-arg-any = true
 pydocstyle.convention = "google"
 
 [tool.pyproject-fmt]
+max_supported_python = "3.15"
 table_format = "long"
 
 [tool.mypy]
