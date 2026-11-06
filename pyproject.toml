@@ -16,19 +16,22 @@ keywords = [
   "singer.io",
 ]
 license = "Apache-2.0"
-requires-python = ">=3.12"
+requires-python = ">=3.13"
 classifiers = [
   "Programming Language :: Python :: 3 :: Only",
-  "Programming Language :: Python :: 3.12",
   "Programming Language :: Python :: 3.13",
   "Programming Language :: Python :: 3.14",
   "Programming Language :: Python :: 3.15",
+  "Programming Language :: Python :: 3.16",
 ]
 dynamic = [ "version" ]
 dependencies = [
   "google-play-scraper==1.2.7",
   "singer-sdk~=0.55.0a1",
 ]
+[[project.maintainers]]
+name = "Edgar Ramírez-Mondragón"
+email = "edgarrm358@gmail.com"
 [[project.authors]]
 name = "Edgar Ramírez-Mondragón"
 email = "edgarrm358@gmail.com"
@@ -36,9 +39,6 @@ email = "edgarrm358@gmail.com"
 [[project.authors]]
 name = "hotglue"
 email = "hello@hotglue.xyz"
-[[project.maintainers]]
-name = "Edgar Ramírez-Mondragón"
-email = "edgarrm358@gmail.com"
 [project.scripts]
 tap-google-play = "tap_google_play.tap:TapGooglePlay.cli"
 
@@ -89,7 +89,7 @@ flake8-annotations.allow-star-arg-any = true
 pydocstyle.convention = "google"
 
 [tool.pyproject-fmt]
-max_supported_python = "3.15"
+max_supported_python = "3.16"
 table_format = "long"
 
 [tool.mypy]
